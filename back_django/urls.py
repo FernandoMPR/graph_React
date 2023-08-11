@@ -16,9 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from facturacion_nomina.views import FacturacionNominaApi
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("FacturacionNomina/", include("facturacion_nomina.urls")),
+    path('get_facturacion/<int:facturacion_id>/', FacturacionNominaApi.as_view(), name='get_facturacion'),
     ]

@@ -147,7 +147,7 @@ function DetallesGrafica(props) {
             {chartData && <Bar data={chartData} options={myOptions} />}
           </div>
           <div>
-            <TablaDetalles />
+            <TablaDetalles  />
           </div>
         </div>
       )}

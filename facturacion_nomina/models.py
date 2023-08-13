@@ -12,8 +12,11 @@ class FacturacionNomina(models.Model):
     
     def __str__(self):
         return f"{self.fecha} - {self.get_categoria_display()}"
+    
+    
 
 class DetallesFactura(models.Model):
+    fecha_tabla = models.DateField(null=True, blank=True)  
     rfc = models.TextField(max_length=100)
     razon_social = models.TextField(max_length=100)
     facturas = models.CharField(max_length=10)

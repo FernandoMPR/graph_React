@@ -28,6 +28,7 @@ ChartJS.register(
 function DetallesGrafica(props) {
   const [chartData, setChartData] = useState();
   const [mostrarDetalles, setMostrarDetalles] = useState(false);
+  const [selectedDate, setSelectedDate] = useState();
 
   useEffect(() => {
     async function fetchData() {
@@ -56,6 +57,9 @@ function DetallesGrafica(props) {
         const formattedFechaClickeada = fechaClickeada
         ? `${fechaObj.getUTCFullYear()}-${(fechaObj.getUTCMonth() + 1).toString().padStart(2, '0')}`
         : "";
+        // console.log(formattedFechaClickeada)
+        setSelectedDate(fechaClickeada)
+        // console.log(fechaClickeada)
 
         const precioPUE = res?.precio_mxn;
         const precioPDD = resPDD?.precio_mxn;
@@ -147,7 +151,7 @@ function DetallesGrafica(props) {
             {chartData && <Bar data={chartData} options={myOptions} />}
           </div>
           <div>
-            <TablaDetalles  />
+            <TablaDetalles  selectedDate={selectedDate}/>
           </div>
         </div>
       )}

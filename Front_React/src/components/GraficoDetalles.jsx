@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { format } from "date-fns";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -14,6 +13,7 @@ import {
 import TablaDetalles from "./TablaDetalles.jsx";
 import BarChart from "./GraficoFacturacionEmitida.jsx";
 import { getDataById, getDataByIdPdd } from "../api/dataAPI.js";
+import { Button } from "./button.jsx";
 
 ChartJS.register(
   CategoryScale,
@@ -50,20 +50,19 @@ function DetallesGrafica(props) {
 
         const res = respuesta?.data;
         const resPDD = respuestaPDD?.data;
-        // console.log("pdd",resPDD)
 
+        //Obtencion de fecha segun la barra clickeada  
         const fechaClickeada = res?.fecha;
         const fechaObj = new Date(`${fechaClickeada}T00:00:00Z`); 
         const formattedFechaClickeada = fechaClickeada
         ? `${fechaObj.getUTCFullYear()}-${(fechaObj.getUTCMonth() + 1).toString().padStart(2, '0')}`
         : "";
-        // console.log(formattedFechaClickeada)
         setSelectedDate(fechaClickeada)
-        // console.log(fechaClickeada)
+
 
         const precioPUE = res?.precio_mxn;
         const precioPDD = resPDD?.precio_mxn;
-        // console.log("prePDD", precioPDD)
+
 
         ////////////////////////////////////////////////////////////
 
@@ -127,30 +126,12 @@ function DetallesGrafica(props) {
       {mostrarDetalles ? (
         <BarChart />
       ) : (
-        <div className="">
-          <button
-            className="bg-white bg-opacity-20 hover:bg-opacity-60 text-gray-600  font-bold rounded-full w-12 h-12 flex items-center justify-center shadow hover:shadow-lg transition duration-300"
-            onClick={() => setMostrarDetalles(!mostrarDetalles)}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6 transform rotate-0"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-          </button>
-          <div className="w-1/2 mx-auto">
+        <div>
+          <Button mostrarDetalles={mostrarDetalles} setMostrarDetalles={setMostrarDetalles}/>
+          <div className="w-full md:w-1/2 mx-auto">
             {chartData && <Bar data={chartData} options={myOptions} />}
           </div>
-          <div>
+          <div className="w-full text-black mt-14">
             <TablaDetalles  selectedDate={selectedDate}/>
           </div>
         </div>

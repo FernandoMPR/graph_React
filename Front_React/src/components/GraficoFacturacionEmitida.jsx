@@ -38,7 +38,7 @@ const BarChart = () => {
     async function fetchData() {
       try {
         const respuesta = await getAllData();
-        // console.log(idsPUE)
+
         if (respuesta.status === 200) {
           const res = respuesta.data;
           const grupos = {};
@@ -67,28 +67,35 @@ const BarChart = () => {
           const preciosPUE = [];
           const preciosPDD = [];
 
-          //Evitar Duplicado de Tablas
+          //SEPARAR PUE Y PDD
           const tempIdsPUE = [];
           const tempIdsPDD = [];
 
+
+          //Filtro de PUE y PDD en fechas.
           visibleLabels.forEach((fecha) => {
             const objetosPUE = grupos[fecha].filter(
               (obj) => obj.categoria === "PUE"
             );
+
+            //Objencion precios de cada PUE
             const preciosObjetosPUE = objetosPUE.map((obj) => obj.precio_mxn);
             preciosPUE.push(preciosObjetosPUE.reduce((a, b) => a + b, 0));
-            // console.log(preciosObjetosPUE)
 
+            //Obtencion de data de PDD  
             const objetosPDD = grupos[fecha].filter(
               (obj) => obj.categoria === "PDD"
             );
-
+            
+            //Obtencion de data de PDD
             const idsObjetosPDD = objetosPDD.map((obj) => obj.id);
             tempIdsPDD.push(idsObjetosPDD);
 
+            //Obtencion de ID de PUE
             const idsObjetosPUE = objetosPUE.map((obj) => obj.id);
             tempIdsPUE.push(idsObjetosPUE);
-
+             
+            //Obtencion de ID de PDD
             const preciosObjetosPDD = objetosPDD.map((obj) => obj.precio_mxn);
             preciosPDD.push(preciosObjetosPDD.reduce((a, b) => a + b, 0));
           });
@@ -126,14 +133,12 @@ const BarChart = () => {
     fetchData();
   }, [scrollData]);
 
+  //Evento click, y obtencion de datos en grafico.
   const handleColumnClick = (event, chartElements) => {
     if (chartElements.length > 0) {
       const clickedIndex = chartElements[0].index;
-      const clickedDate = chartData.labels[clickedIndex];
       setIdsPUE(idsPUE[clickedIndex] ? idsPUE[clickedIndex] : null);
       setIdsPDD(idsPDD[clickedIndex] ? idsPDD[clickedIndex] : null);
-
-      // console.log("Clicked Date:", clickedDate);
 
       const datosColumna = chartData.datasets.map(
         (dataset) => dataset.data[clickedIndex]
@@ -145,16 +150,15 @@ const BarChart = () => {
     }
   };
 
-  useEffect(() => {
-    // console.log(clickedColumnData)
-  }, [clickedColumnData]);
 
+  //Scroll de grafico
   const handleScroll = (event) => {
     const scrollDirection = event.deltaY > 0 ? 1 : -1;
     setScrollData((prevScroll) => prevScroll + scrollDirection);
   };
 
   const myOptions = {
+    maintainAspectRatio: window.innerWidth >= 768,
     scales: {
       x: {
         stacked: true, // Superponer en el eje x
@@ -180,6 +184,7 @@ const BarChart = () => {
         },
       },
     },
+    //Colocar mouse pointer solo a barra
     onHover: (event, elements) => {
       if (elements.length > 0) {
         setHovered(true);
@@ -202,22 +207,24 @@ const BarChart = () => {
           onWheel={handleScroll}
         >
           {chartData && (
-            <Bar
-              data={chartData}
-              options={{
-                ...myOptions,
-                onClick: (event, chartElements) =>
-                  handleColumnClick(event, chartElements),
-                onHover: (event, elements) => {
-                  if (elements.length > 0) {
-                    setHovered(true);
-                  } else {
-                    setHovered(false);
-                  }
-                },
-              }}
-              style={{ cursor: hovered ? "pointer" : "default" }}
-            />
+            <div className="w-full md:max-w-screen-md lg:max-w-screen-lg">
+              <Bar
+                data={chartData}
+                options={{
+                  ...myOptions,
+                  onClick: (event, chartElements) =>
+                    handleColumnClick(event, chartElements),
+                  onHover: (event, elements) => {
+                    if (elements.length > 0) {
+                      setHovered(true);
+                    } else {
+                      setHovered(false);
+                    }
+                  },
+                }}
+                style={{ cursor: hovered ? "pointer" : "default" }}
+              />
+            </div>
           )}
         </div>
       )}

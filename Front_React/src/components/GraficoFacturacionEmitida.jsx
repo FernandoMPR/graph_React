@@ -34,11 +34,11 @@ const BarChart = () => {
   const [idsPUE, setIdsPUE] = useState([]);
   const [idsPDD, setIdsPDD] = useState([]);
 
+
   useEffect(() => {
     async function fetchData() {
       try {
         const respuesta = await getAllData();
-
         if (respuesta.status === 200) {
           const res = respuesta.data;
           const grupos = {};

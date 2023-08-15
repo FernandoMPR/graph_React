@@ -125,6 +125,7 @@ function DetallesGrafica(props) {
     <div>
       {mostrarDetalles ? (
         <BarChart />
+        
       ) : (
         <div>
           <Button mostrarDetalles={mostrarDetalles} setMostrarDetalles={setMostrarDetalles}/>

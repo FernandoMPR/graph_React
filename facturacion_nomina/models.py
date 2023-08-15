@@ -24,6 +24,7 @@ class DetallesFactura(models.Model):
     pue = models.IntegerField()
     nomina = models.IntegerField()
     all = models.IntegerField(blank=True)
+    # ejemplo = models.TextField(max_length=100, null=True)
 
     def save(self, *args, **kwargs):
         self.all = self.nomina + self.pdd + self.pue

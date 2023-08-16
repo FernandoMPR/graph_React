@@ -29,8 +29,12 @@ const TablaDetalles = ({ selectedDate }) => {
               Object.keys(data[0])
                 .filter((field) => field !== "id" && field !== "fecha_tabla")
                 .map((field, index) => (
-                  <th key={index} className="px-2 py-1 md:px-4 md:py-2" style={{ textTransform: 'uppercase' }}>
-                    {field.replace(/_/g, ' ')}
+                  <th
+                    key={index}
+                    className="px-2 py-1 md:px-4 md:py-2"
+                    style={{ textTransform: "uppercase" }}
+                  >
+                    {field.replace(/_/g, " ")}
                   </th>
                 ))}
           </tr>

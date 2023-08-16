@@ -33,35 +33,37 @@ function DetallesGrafica(props) {
   useEffect(() => {
     async function fetchData() {
       try {
-        const pueID = props.pueID.length > 0 ? props.pueID : null;
-        const facturaID = pueID;
-        const pddID = props.pddID.length > 0 ? props.pddID : null;
-        const facturaIdPDD = pddID;
-
         let respuesta = null;
-        if (pueID) {
-          respuesta = await getDataById(facturaID);
+        let respuestaPDD = null;
+
+        if (props.pueID) {
+          respuesta = await getDataById(props.pueID);
         }
 
-        let respuestaPDD = null;
-        if (pddID) {
-          respuestaPDD = await getDataByIdPdd(facturaIdPDD);
+        if (props.pddID) {
+          respuestaPDD = await getDataByIdPdd(props.pddID);
         }
 
         const res = respuesta?.data;
         const resPDD = respuestaPDD?.data;
 
-        //Obtencion de fecha segun la barra clickeada  
-        const fechaClickeada = res?.fecha;
-        const fechaObj = new Date(`${fechaClickeada}T00:00:00Z`); 
-        const formattedFechaClickeada = fechaClickeada
-        ? `${fechaObj.getUTCFullYear()}-${(fechaObj.getUTCMonth() + 1).toString().padStart(2, '0')}`
-        : "";
-        setSelectedDate(fechaClickeada)
+        let formattedFechaClickeada = "";
+        let precioPUE = null;
+        let precioPDD = null;
 
+        if (res) {
+          const fechaClickeada = res.fecha;
+          const fechaObj = new Date(`${fechaClickeada}T00:00:00Z`);
+          formattedFechaClickeada = fechaClickeada
+            ? `${fechaObj.getUTCFullYear()}-${(fechaObj.getUTCMonth() + 1).toString().padStart(2, '0')}`
+            : "";
+          precioPUE = res.precio_mxn;
+          setSelectedDate(fechaClickeada);
+        }
 
-        const precioPUE = res?.precio_mxn;
-        const precioPDD = resPDD?.precio_mxn;
+        if (resPDD) {
+          precioPDD = resPDD.precio_mxn;
+        }
 
 
         ////////////////////////////////////////////////////////////
@@ -71,7 +73,7 @@ function DetallesGrafica(props) {
           datasets: [
             {
               label: "Pago único (PUE)",
-              data: [precioPUE ? precioPUE : "0"],
+              data: [precioPUE],
               backgroundColor: "rgba(255, 99, 132, 0.6)",
               borderColor: "rgba(255, 99, 132, 1)",
               borderWidth: 2,

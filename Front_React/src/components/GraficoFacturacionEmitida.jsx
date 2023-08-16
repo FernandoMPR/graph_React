@@ -34,72 +34,62 @@ const BarChart = () => {
   const [idsPUE, setIdsPUE] = useState([]);
   const [idsPDD, setIdsPDD] = useState([]);
 
-
   useEffect(() => {
     async function fetchData() {
       try {
+        function obtenerPrecios(objetos) {
+          return objetos
+            .map((obj) => obj.precio_mxn)
+            .reduce((a, b) => a + b, 0);
+        }
         const respuesta = await getAllData();
         if (respuesta.status === 200) {
           const res = respuesta.data;
-          const grupos = {};
 
-          res.forEach((obj) => {
+          // Agrupar por fechas
+          const grupos = res.reduce((acc, obj) => {
             const fecha = obj.fecha.substring(0, 7);
-
-            if (!grupos[fecha]) {
-              grupos[fecha] = [];
+            if (!acc[fecha]) {
+              acc[fecha] = [];
             }
+            acc[fecha].push(obj);
+            return acc;
+          }, {});
 
-            grupos[fecha].push(obj);
-          });
-
-          //Eje X ordenado por Fechas
-          const labels = Object.keys(grupos).sort(); // Ordenar las fechas de menor a mayor
+          // Obtener fechas visibles
+          const labels = Object.keys(grupos).sort();
           const maxVisibleBars = 7;
           const startIndex = Math.max(
             0,
             labels.length - maxVisibleBars - scrollData
           );
           const endIndex = startIndex + maxVisibleBars;
-          const visibleLabels = labels.slice(startIndex, endIndex).reverse(); // Revertir el orden de las fechas
+          const visibleLabels = labels.slice(startIndex, endIndex).reverse();
 
-          //PRECIOS POR FECHAS
+          // Precios y IDs por fechas
           const preciosPUE = [];
           const preciosPDD = [];
-
-          //SEPARAR PUE Y PDD
           const tempIdsPUE = [];
           const tempIdsPDD = [];
 
-
-          //Filtro de PUE y PDD en fechas.
           visibleLabels.forEach((fecha) => {
-            const objetosPUE = grupos[fecha].filter(
+            const objetosFecha = grupos[fecha];
+            
+            const objetosPUE = objetosFecha.filter(
               (obj) => obj.categoria === "PUE"
             );
-
-            //Objencion precios de cada PUE
-            const preciosObjetosPUE = objetosPUE.map((obj) => obj.precio_mxn);
-            preciosPUE.push(preciosObjetosPUE.reduce((a, b) => a + b, 0));
-
-            //Obtencion de data de PDD  
-            const objetosPDD = grupos[fecha].filter(
+            const objetosPDD = objetosFecha.filter(
               (obj) => obj.categoria === "PDD"
             );
-            
-            //Obtencion de data de PDD
-            const idsObjetosPDD = objetosPDD.map((obj) => obj.id);
-            tempIdsPDD.push(idsObjetosPDD);
 
-            //Obtencion de ID de PUE
-            const idsObjetosPUE = objetosPUE.map((obj) => obj.id);
-            tempIdsPUE.push(idsObjetosPUE);
-             
-            //Obtencion de ID de PDD
-            const preciosObjetosPDD = objetosPDD.map((obj) => obj.precio_mxn);
-            preciosPDD.push(preciosObjetosPDD.reduce((a, b) => a + b, 0));
+            preciosPUE.push(obtenerPrecios(objetosPUE));
+            preciosPDD.push(obtenerPrecios(objetosPDD));
+
+            tempIdsPUE.push(objetosPUE.map((obj) => obj.id));
+            tempIdsPDD.push(objetosPDD.map((obj) => obj.id));
           });
 
+          // Procesar datos
           const processedData = {
             labels: visibleLabels,
             datasets: [
@@ -119,6 +109,8 @@ const BarChart = () => {
               },
             ],
           };
+
+          // Actualizar estados
           setIdsPUE(tempIdsPUE);
           setIdsPDD(tempIdsPDD);
           setChartData(processedData);
@@ -133,25 +125,22 @@ const BarChart = () => {
     fetchData();
   }, [scrollData]);
 
-  //Evento click, y obtencion de datos en grafico.
   const handleColumnClick = (event, chartElements) => {
     if (chartElements.length > 0) {
       const clickedIndex = chartElements[0].index;
-      setIdsPUE(idsPUE[clickedIndex] ? idsPUE[clickedIndex] : null);
-      setIdsPDD(idsPDD[clickedIndex] ? idsPDD[clickedIndex] : null);
-
+      const newIdsPUE = idsPUE[clickedIndex] || null;
+      const newIdsPDD = idsPDD[clickedIndex] || null;
       const datosColumna = chartData.datasets.map(
         (dataset) => dataset.data[clickedIndex]
       );
 
-      // Actualiza el estado de datos de columna y muestra los detalles
+      setIdsPUE(newIdsPUE);
+      setIdsPDD(newIdsPDD);
       setClickedColumnData(datosColumna);
       setMostrarDetalles(true);
     }
   };
 
-
-  //Scroll de grafico
   const handleScroll = (event) => {
     const scrollDirection = event.deltaY > 0 ? 1 : -1;
     setScrollData((prevScroll) => prevScroll + scrollDirection);
@@ -193,6 +182,7 @@ const BarChart = () => {
       }
     },
   };
+
   return (
     <>
       {mostrarDetalles ? (
@@ -202,12 +192,9 @@ const BarChart = () => {
           pddID={idsPDD}
         />
       ) : (
-        <div
-          className="flex items-center justify-center bg-gray-100"
-          onWheel={handleScroll}
-        >
+        <div onWheel={handleScroll}>
           {chartData && (
-            <div className="w-full md:max-w-screen-md lg:max-w-screen-lg">
+            <div>
               <Bar
                 data={chartData}
                 options={{

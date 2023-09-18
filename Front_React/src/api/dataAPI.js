@@ -15,7 +15,7 @@ export const getDetallesData = () => {
 export const getDataById = async (facturacionId) => {
   try {
     const response = await axios.get(
-      `https://graph-con-django-y-react.onrender.com/FacturacionNomina/api/v1/DetallesFactura/${facturacionId}/`
+      `https://graph-con-django-y-react.onrender.com/FacturacionNomina/api/v1/DetallesFactura/${facturacionId}`
     );
     if (response.status === 200) {
       return response;
@@ -33,7 +33,7 @@ export const getDataById = async (facturacionId) => {
 export const getDataByIdPdd = async (facturacionIdPdd) => {
   try {
     const response = await axios.get(
-      `https://graph-con-django-y-react.onrender.com/FacturacionNomina/api/v1/DetallesFactura/get_facturacion/${facturacionIdPdd}/`
+      `https://graph-con-django-y-react.onrender.com/FacturacionNomina/api/v1/DetallesFactura/${facturacionIdPdd}`
     );
     if (response.status === 200) {
       return response;

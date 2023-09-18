@@ -150,6 +150,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "https://graficoconbasededatos.web.app",
     "https://graph-con-django-y-react.onrender.com",
+    "https://graficoconbasededatos.firebaseapp.com",
 ]
 
 
